@@ -1,26 +1,63 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
+import {Route} from "react-router-dom";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Footer from './Footer.js';
+import Homepage from './Homepage.js';
+import Aboutpage from './Aboutpage.js';
+import Photogallerypage from './Photogallerypage.js'
+import Contactpage from './Contactpage.js'
+import Eventpage from './Eventpage.js';
+import Videogallerypage from './Videogallerypage.js';
+import Loginpage from './Loginpage.js';
+import Navs from './Navs.js';
+// import Testpage from './Testpage.js';
+
+import Activity from './Activity.js';
+import User from './User.js';
+import Payment from './Payment.js';
+import Addpost from './Addpost.js';
+import Posts from './Posts.js';
+import Imagetogallery from './Imagetogallery.js';
+import Eachpayment from './Eachpayment.js'
+import Accessdenied from './Accessdenied.js';
+
+
+class App extends Component {
+  render() {
+    return (
+      <div>
+
+      			
+         
+         
+
+        
+           
+          
+            <Route exact path="/" component={Homepage}/>
+            <Route path="/about" component={Aboutpage}/>
+            <Route path="/photogallery" component={Photogallerypage}/>
+            <Route path="/videogallery" component={Videogallerypage}/>
+            <Route path="/event" component={Eventpage}/>
+            <Route path="/contact" component={Contactpage}/>
+            <Route path="/login" component={Loginpage}/>
+            
+            <Route path="/activity" component={Activity}/>
+            
+            <Route path="/user" component={User}/>
+            <Route path="/payment" component={Payment}/>
+            <Route path="/addpost" component={Addpost}/>
+            <Route path="/posts" component={Posts}/> 
+            <Route path="/uploadimage" component={Imagetogallery} />
+            <Route path="/accessdenied" component={Accessdenied} />
+            <Route path="/eachpayment" component={Eachpayment} />   
+       
+            
+          
+       
+      </div>
+    );
+  }
 }
 
 export default App;
