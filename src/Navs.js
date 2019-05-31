@@ -1,13 +1,9 @@
 import React, {Component} from 'react';
-import {
-  Switch,
-  Route,
-  NavLink,
-  HashRouter
-} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 import UserProfile from './LoginEnclosure.js';
 
 class Navs extends Component{
+
 
 		constructor(props){
 
@@ -20,11 +16,7 @@ class Navs extends Component{
 				photogallery:"nav-item",
 				videogallery:"nav-item",
 				event:"nav-item",
-				contact:"nav-item",
-
-			
-			active: "nav-item active",
-			nonactive: "nav-item"
+				contact:"nav-item"
 		}
 		componentWillMount=(e)=>{
 			console.log(UserProfile.getNav());
@@ -40,16 +32,16 @@ class Navs extends Component{
 	 }
 
 		handleclick=(e)=>{
-			console.log(e);
+			// console.log(e);
 			UserProfile.setNav(e);
-			console.log("enclosure");
+			// console.log("enclosure");
 			console.log(UserProfile.getNav());
 			for (var item in this.state){
 
 				console.log(item)
 				if (item == e){
-					console.log("match");
-					console.log(item);
+					// console.log("match");
+					// console.log(item);
 
 					var stateObject = function() {
 				      var returnObj = {};

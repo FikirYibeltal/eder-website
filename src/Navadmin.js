@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
 import {
-  Switch,
   Route,
   NavLink,
-  HashRouter,
   withRouter
 } from "react-router-dom";
 import UserProfile from './LoginEnclosure.js';
@@ -25,11 +23,7 @@ class Navadmin extends Component{
 				activity:"nav-item",
 				payment:"nav-item",
 				post:"nav-item",
-				
 
-			
-			active: "nav-item active",
-			nonactive: "nav-item",
 			username:"",
 			user:[]
 		}
@@ -45,16 +39,7 @@ class Navadmin extends Component{
 	          console.log(this.state.user);
 	      });
 
-			console.log(UserProfile.getNav());
-      	if(UserProfile.getNav()==""){
-      		this.setState({
-      			home:"nav-item active"
-      		})
-      	}else{
-      		this.setState({
-      			[UserProfile.getNav()]:"nav-item active"
-      		})
-      	}
+			
       	var name=UserProfile.getName().charAt(0).toUpperCase();
       	this.setState({
       		username:name
@@ -66,38 +51,7 @@ class Navadmin extends Component{
 	 }
 
 		handleclick=(e)=>{
-			console.log(e);
-			UserProfile.setNav(e);
-			console.log("enclosure");
-			console.log(UserProfile.getNav());
-			for (var item in this.state){
 
-				console.log(item)
-				if (item == e){
-					console.log("match");
-					console.log(item);
-
-					var stateObject = function() {
-				      var returnObj = {};
-				      returnObj[item] = "nav-item active";
-				         return returnObj;
-				    }.bind(e)();
-
-				    this.setState( stateObject ); 
-					// this.setState({
-					// 	item.value:"nav-item active"
-					// });
-				} 
-				// else if(item=="active"){
-
-
-				// }else{
-				// 	this.setState({
-				// 		item:"nav-item"
-				// 	})
-				// }
-			}
-			console.log(this.state);
 		}
 
 		onclick=(e)=>{
@@ -105,8 +59,15 @@ class Navadmin extends Component{
 				e.preventDefault();
 			    UserProfile.setName("");
 	       		UserProfile.setId("");
-	       		let path = ``;
-    			this.props.history.push(path);
+	       		if((!UserProfile.getName() || UserProfile.getNav()=="") && UserProfile.getNav()!='home'){
+			        let path = UserProfile.getNav();
+			      	this.props.history.push(path);
+			    }else{
+			    	let path = ``;
+    				this.props.history.push(path);
+			    }
+
+	       		
 	   }
 	
 

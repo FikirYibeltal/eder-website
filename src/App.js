@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Route} from "react-router-dom";
+import {Route,withRouter} from "react-router-dom";
 
 import Footer from './Footer.js';
 import Homepage from './Homepage.js';
@@ -20,9 +20,19 @@ import Posts from './Posts.js';
 import Imagetogallery from './Imagetogallery.js';
 import Eachpayment from './Eachpayment.js'
 import Accessdenied from './Accessdenied.js';
-
+import UserProfile from './LoginEnclosure.js';
 
 class App extends Component {
+
+    componentWillMount=(e)=>{
+    console.log(UserProfile.getNav());
+   
+    if((!UserProfile.getName() || UserProfile.getNav()=="") && UserProfile.getNav()!='home'){
+        let path = UserProfile.getNav();
+      this.props.history.push(path);
+    }
+      
+  }
   render() {
     return (
       <div>
@@ -60,4 +70,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default withRouter(App);

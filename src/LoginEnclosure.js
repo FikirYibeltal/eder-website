@@ -2,7 +2,7 @@ var UserProfile = (function() {
   var Name = "";
   var User_id= -1;
   var Nav="";
-  
+  var Path="";
 
   function getCookie(cname) {
   var name = cname + "=";
@@ -19,6 +19,15 @@ var UserProfile = (function() {
   }
   return "";
 }
+
+function writeCookie (key, value, minutes) {
+    var date = new Date();
+    minutes = minutes || 1;    
+    date.setTime(+ date + (minutes * 60000)); 
+    window.document.cookie = key + "=" + value + "; expires=" + date.toGMTString() + ";";
+    return value;
+}
+
   var getName = function() {
     console.log(getCookie("name"));
     if(getCookie("name")==""){
@@ -31,7 +40,8 @@ var UserProfile = (function() {
   };
 
   var setName = function(name) {
-    document.cookie=`name=${name};`
+    writeCookie('name',name,120)
+    // document.cookie=`name=${name};`
     Name = name;    
     // Also set this in cookie/localStorage
   };
@@ -49,26 +59,50 @@ var UserProfile = (function() {
   };
 
   var setId = function(name) {
-    document.cookie=`User_id=${name};`
+    writeCookie('User_id',name,120)
+    // document.cookie=`User_id=${name};`
     User_id = name;     
     // Also set this in cookie/localStorage
   };
    var getNav = function() {
+    if(getCookie('Nav')==""){
+      return Nav;
+    }else{
+      return getCookie("Nav");
+    }
     return Nav;    // Or pull this from cookie/localStorage
   };
 
   var setNav = function(name) {
+    writeCookie('Nav',name,120)
+    // document.cookie=`Nav=${name};`
     Nav = name;     
     // Also set this in cookie/localStorage
   };
 
+   var getPath = function() {
+    if(getCookie('Path')==""){
+      return Path;
+    }else{
+      return getCookie("Path");
+    }
+    return Path;    // Or pull this from cookie/localStorage
+  };
+
+  var setPath = function(name) {
+    document.cookie=`Path=${name};`
+    Path = name;     
+    // Also set this in cookie/localStorage
+  };
   return {
     getName: getName,
     setName: setName,
     getId:getId,
     setId:setId,
     getNav:getNav,
-    setNav:setNav
+    setNav:setNav,
+    getPath:getPath,
+    setPath:setPath
   }
 
 })();
