@@ -5,6 +5,8 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import Navadmin from './Navadmin.js';
 import {withRouter} from 'react-router-dom';
 import UserProfile from './LoginEnclosure.js';
+import {connect} from 'react-redux';
+import {fetchActivityApi,activityAction} from './actions/activity-action';
 class Activity extends Component {
    constuctor() {
           this.routeChange = this.routeChange.bind(this);
@@ -15,10 +17,7 @@ class Activity extends Component {
     //  this.state.products = [];
     this.state = {};
     this.state.filterText = "";
-    this.state.products = [
-      
-    ];
-
+    
   }
   componentWillMount=(e)=>{
     console.log(UserProfile.getName());
@@ -26,23 +25,8 @@ class Activity extends Component {
         let path = `accessdenied`;
       this.props.history.push(path);
     }
-      
+     this.props.onfetchActivityApi(); 
   }
-
-     componentDidMount=(e)=>{
-    axios.get("/getactivity")
-      .then((res)=>{
-        console.log(res);
-
-        this.setState({
-          products:res.data
-        });
-        
-      });
-
-
-
-   }
 
   handleUserInput(filterText) {
     this.setState({filterText: filterText});
@@ -55,16 +39,18 @@ class Activity extends Component {
         console.log('delete data');
         console.log(res);
       });
-    var index = this.state.products.indexOf(product);
-    this.state.products.splice(index, 1);
-    this.setState(this.state.products);
+    var products=this.props.products.activity;
+    var index = products.indexOf(product);
+    products.splice(index, 1);
+    this.props.onActivityUpdate(products);
   };
 
   handleAddEvent(evt) {
     while(true){
     var bool=true;
     var id = (Math.floor(Math.random() * 999999));
-    this.state.products.map((item)=>{
+
+    this.props.products.activity.map((item)=>{
       if(id> 1000 && id != item.Activity_id){
         bool=true;
       }else{
@@ -84,8 +70,11 @@ class Activity extends Component {
       Description: "",
       Minimum: "",
     }
-    this.state.products.unshift(product);
-    this.setState(this.state.products);
+    let products=this.props.products.activity;
+    products.unshift(product);
+    this.props.onActivityUpdate(products);
+    // this.state.products.unshift(product);
+    // this.setState(this.state.products);
 
   }
 
@@ -97,7 +86,7 @@ class Activity extends Component {
     };
     // console.log(item);
       
-var products = this.state.products.slice();
+var products = this.props.products.activity.slice();
   // console.log(products);
 
   var newProducts = products.map(function(product) {
@@ -111,13 +100,14 @@ var products = this.state.products.slice();
     }
     return product;
   });
-    this.setState({products:newProducts});
+    this.props.onActivityUpdate(newProducts);
+    // this.setState({products:newProducts});
   //  console.log(this.state.products);
   };
 
   updatedatabase(e){
     // console.log(this.state.products);
-    this.state.products.map((item)=>{
+    this.props.products.activity.map((item)=>{
       if(parseInt(item.Activity_id)<1000){
         
         axios.post('/updateactivity', {
@@ -154,7 +144,7 @@ var products = this.state.products.slice();
         <Navadmin />
         <div class="belownav"></div>
         <h2 class="title-style-1">Activity List <span class="title-under"></span></h2>
-        <ProductTable  onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.state.products} filterText={this.state.filterText}/>
+        <ProductTable  onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.props.products.activity} filterText={this.state.filterText}/>
       </div>
     );
 
@@ -212,12 +202,15 @@ class ProductTable extends React.Component {
     var onProductTableUpdate = this.props.onProductTableUpdate;
     var rowDel = this.props.onRowDel;
     var filterText = this.props.filterText;
-    var product = this.props.products.map(function(product) {
+    if(this.props.products){
+        var product = this.props.products.map(function(product) {
       if (product.Description.indexOf(filterText) === -1) {
         return;
       }
       return (<ProductRow onProductTableUpdate={onProductTableUpdate} product={product} onDelEvent={rowDel.bind(this)} key={product.id}/>)
     });
+    }
+    
 
     return (
       <div>
@@ -346,6 +339,11 @@ class EditableCell extends React.Component {
   }
 
 }
-
-
-export default withRouter(Activity);
+const mapStateToProps=state=>({
+    products:state.activity
+});
+const mapActionsToProps={
+    onfetchActivityApi:fetchActivityApi,
+    onActivityUpdate:activityAction
+}
+export default connect(mapStateToProps,mapActionsToProps)(withRouter(Activity));

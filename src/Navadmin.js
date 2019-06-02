@@ -31,12 +31,12 @@ class Navadmin extends Component{
 			var urls=`/user/${UserProfile.getId()}`;
 	      axios.get(urls)
 	      .then((res)=>{
-	          console.log(res);
+	          //console.log(res);
 	          this.setState({
 	            user:res.data
 	          });
-	          console.log('component')
-	          console.log(this.state.user);
+	          //console.log('component')
+	          //console.log(this.state.user);
 	      });
 
 			
@@ -74,12 +74,12 @@ class Navadmin extends Component{
 	render(){
 		var admin;
 		var x=[];
-		console.log('state');
-		console.log(this.state.user);
-		console.log('statess')
+		//console.log('state');
+		//console.log(this.state.user);
+		//console.log('statess')
 		let user=this.state.user;
 		 if(user.length!=0){
-		 				console.log('hello1');
+		 				//console.log('hello1');
 						
 						  if(user[0].Type==0){
 				 admin=<div class="collapse navbar-collapse main-menus" id="navbarSupportedContent">
@@ -146,7 +146,7 @@ class Navadmin extends Component{
 
 
 		 }else{
-		 	console.log('hello2');
+		 	//console.log('hello2');
 		 }
 
 

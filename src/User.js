@@ -5,6 +5,9 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import Navadmin from './Navadmin.js';
 import UserProfile from './LoginEnclosure.js';
 import {withRouter} from 'react-router-dom';
+import {connect} from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { fetchApi,updateUser } from './actions/user-action';
 class User extends Component {
   constuctor() {
           this.routeChange = this.routeChange.bind(this);
@@ -12,9 +15,7 @@ class User extends Component {
 
   constructor(props) {
     super(props);
-    
-
-    //  this.state.products = [];
+        //  this.state.products = [];
     this.state = {};
     this.state.filterText = "";
     this.state.products = [
@@ -23,44 +24,30 @@ class User extends Component {
 
   }
   componentWillMount=(e)=>{
-    console.log(UserProfile.getName());
+    //console.log(UserProfile.getName());
     if(!UserProfile.getName() || UserProfile.getName()==""){
         let path = `accessdenied`;
       this.props.history.push(path);
     }
-      
+     this.props.onFetchApi(); 
   }
-
-
-  	 componentDidMount=(e)=>{
-		axios.get("/getalluser")
-			.then((res)=>{
-				console.log(res);
-
-				this.setState({
-					products:res.data
-				});
-				
-			});
-
-
-
-	 }
 
   handleUserInput(filterText) {
     this.setState({filterText: filterText});
   };
   handleRowDel(product) {
-  	console.log(product);
-  	console.log('/deleteuser/'+product.User_id);
+  	// console.log(product);
+  	// console.log('/deleteuser/'+product.User_id);
   	axios.delete(`/deleteuser/${product.User_id}`)
 			.then((res)=>{
-				console.log('delete data');
-				console.log(res);
+				//console.log('delete data');
+				//console.log(res);
 			});
-    var index = this.state.products.indexOf(product);
-    this.state.products.splice(index, 1);
-    this.setState(this.state.products);
+    var index = this.props.products.users.indexOf(product);
+    let products=this.props.products.users;
+    products.splice(index, 1);
+    this.props.onUpdateUser(products);
+    // this.setState(this.state.products);
   };
 
   handleAddEvent(evt) {
@@ -91,8 +78,11 @@ class User extends Component {
       Password: pas,
       Type: 1
     }
-    this.state.products.unshift(product);
-    this.setState(this.state.products);
+    let products=this.props.products.users;
+    products.unshift(product);
+    this.props.onUpdateUser(products);
+    // this.state.products.unshift(product);
+    // this.setState(this.state.products);
 
 
   }
@@ -105,7 +95,7 @@ class User extends Component {
     };
     // console.log(item);
   		
-var products = this.state.products.slice();
+var products = this.props.products.users.slice();
 	// console.log(products);
 
   var newProducts = products.map(function(product) {
@@ -119,13 +109,14 @@ var products = this.state.products.slice();
     }
     return product;
   });
-    this.setState({products:newProducts});
-  //  console.log(this.state.products);
-  };
+  this.props.onUpdateUser(newProducts);
+  //   this.setState({products:newProducts});
+  
+   };
 
   updatedatabase(e){
   	// console.log(this.state.products);
-  	this.state.products.map((item)=>{
+  	this.props.products.users.map((item)=>{
   		if(parseInt(item.User_id)<1000){
   			
   			axios.post('/updateuser', {
@@ -136,7 +127,7 @@ var products = this.state.products.slice();
 			    Password: item.Password,
 			    Type: item.Type
 			  }).then((res,err)=>{
-			  	console.log(err);
+			  	//console.log(err);
 			  });
 			  
   		}
@@ -149,7 +140,7 @@ var products = this.state.products.slice();
 			    Password: item.Password,
 			    Type: parseInt(item.Type)
 			  }).then((res,err)=>{
-			  	console.log(err);
+			  	//console.log(err);
 			  });
   			
   		}
@@ -160,13 +151,12 @@ var products = this.state.products.slice();
   }
 
   render() {
-
     return (
       <div>
         <Navadmin />
         <div class="belownav"></div>
         <h2 class="title-style-1">Members List <span class="title-under"></span></h2>
-        <ProductTable  onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.state.products} filterText={this.state.filterText}/>
+        <ProductTable  onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.props.products.users} filterText={this.state.filterText}/>
       </div>
     );
 
@@ -224,12 +214,15 @@ class ProductTable extends React.Component {
     var onProductTableUpdate = this.props.onProductTableUpdate;
     var rowDel = this.props.onRowDel;
     var filterText = this.props.filterText;
-    var product = this.props.products.map(function(product) {
-      if (product.Name.indexOf(filterText) === -1) {
-        return;
-      }
-      return (<ProductRow onProductTableUpdate={onProductTableUpdate} product={product} onDelEvent={rowDel.bind(this)} key={product.id}/>)
-    });
+    if(this.props.products){
+        var product = this.props.products.map(function(product) {
+        if (product.Name.indexOf(filterText) === -1) {
+          return;
+        }
+        return (<ProductRow onProductTableUpdate={onProductTableUpdate} product={product} onDelEvent={rowDel.bind(this)} key={product.id}/>)
+      });
+    }
+    
 
     return (
       <div>
@@ -306,7 +299,7 @@ class ProductRow extends React.Component {
   }
   render() {
   	var usertypess=this.usertypes(this.props.product.Type);
-  	console.log(usertypess);
+  	//console.log(usertypess);
   	var useridfield;
   	if (this.props.product.User_id){ 
         useridfield=<EditableCells onProductTableUpdate={this.props.onProductTableUpdate} cellData={{
@@ -399,4 +392,11 @@ class DropdownCell extends React.Component {
   }
 
 }
-export default withRouter(User);
+const mapActionsToProps={
+  onFetchApi:fetchApi,
+  onUpdateUser:updateUser
+}
+const mapStateToProps=state=>({
+  products:state.users
+})
+export default connect(mapStateToProps,mapActionsToProps)(withRouter(User));

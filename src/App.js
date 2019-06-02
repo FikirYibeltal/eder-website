@@ -25,7 +25,7 @@ import UserProfile from './LoginEnclosure.js';
 class App extends Component {
 
     componentWillMount=(e)=>{
-    console.log(UserProfile.getNav());
+    // console.log(UserProfile.getNav());
    
     if((!UserProfile.getName() || UserProfile.getNav()=="") && UserProfile.getNav()!='home'){
         let path = UserProfile.getNav();

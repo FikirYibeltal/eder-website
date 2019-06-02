@@ -10,12 +10,15 @@ import {applyMiddleware,combineReducers,createStore,compose} from 'redux';
 import {Provider} from 'react-redux';
 import thunk from 'redux-thunk';
 import messageReducer from './reducers/message-reducer';
-
+import userReducer from './reducers/users-reducer';
+import activityReducer from './reducers/activity-reducer';
 //middleware
 const middlewares=[thunk];
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const allReducers=combineReducers({
-		message:messageReducer	
+		message:messageReducer,
+		users:userReducer,
+		activity:activityReducer	
 });
 
 const store=createStore(allReducers,{
@@ -23,7 +26,9 @@ const store=createStore(allReducers,{
 		name:"",
 		email:"",
 		message:""
-	}
+	},
+	users:[],
+	activity:[]
 },
 
 	composeEnhancers(applyMiddleware(...middlewares))
