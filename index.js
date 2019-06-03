@@ -162,6 +162,30 @@ app.get('/getalluser',(req,res)=>{
     res.send(results);
     });
 });
+
+app.get('/getusername',(req,res)=>{
+    let usernames=[];
+    db.query("SELECT Name FROM Users ORDER BY User_id DESC", function(err,result,fields){
+        if(err) throw err;
+        
+        for(var i=0;i<result.length;i++){
+            usernames.push(result[i].Name);
+        }
+    res.send(usernames);
+    });
+});
+
+app.get('/getdescription',(req,res)=>{
+    let description=[];
+    db.query("SELECT Description FROM Activity ORDER BY Activity_id DESC", function(err,result,fields){
+        if(err) throw err;
+        
+        for(var i=0;i<result.length;i++){
+            description.push(result[i].Description);
+        }
+    res.send(description);
+    });
+});
 app.get('/getallpost',(req,res)=>{
   
     db.query("SELECT * FROM Post ORDER BY Post_id DESC", function(err,result,fields){
@@ -297,7 +321,16 @@ app.get('/getpayment',(req,res)=>{
 
     
 });
+app.get('/getpaymentleftjoined',(req,res)=>{
+    let results=null;
+    db.query("SELECT Payment.*,Users.Name,Activity.Description FROM Payment LEFT JOIN Users ON Users.User_id=Payment.User_id LEFT JOIN Activity ON Activity.Activity_id=Payment.Activity_id ORDER BY Payment_id DESC", function(err,result,fields){
+        if(err) throw err;
+        results=JSON.stringify(result);
+    res.send(results);
+    });
 
+    
+});
 
 
 

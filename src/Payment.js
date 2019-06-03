@@ -8,6 +8,10 @@ import Navadmin from './Navadmin.js';
 import './App.css';
 import {withRouter} from 'react-router-dom';
 import UserProfile from './LoginEnclosure.js';
+import {connect} from 'react-redux';
+import {paymentAction,fetchPaymentApi} from './actions/payment-action';
+import {usernameAction,fetchUsernameApi} from './actions/username-action';
+import {descriptionAction,fetchDescriptionApi} from './actions/description-action';
 class Payment extends Component {
    constuctor() {
           this.routeChange = this.routeChange.bind(this);
@@ -18,96 +22,8 @@ class Payment extends Component {
     //  this.state.products = [];
     this.state = {};
     this.state.filterText = "";
-    this.state.products = [
-      
-    ];
-    this.state.usernames=[];
-    this.state.nameandid=[];
-    this.state.description=[];
-    this.state.activityandid=[];
-    this.state.payment=[];
-    this.state.users=[];
-    this.state.activity=[];
     
-    console.log(UserProfile.getName());
-    console.log(UserProfile.getId());
-
-
-    axios.get("/getpayment")
-      .then((res)=>{
-        
-         this.state.payment=res.data;
-         // console.log(payment);
-        this.setState({
-          products:res.data
-        });
-        
-
-
-      });
-       axios.get("/getalluser")
-      .then((res)=>{
-        
-
-        
-        this.state.users=res.data;
-        // console.log(users);
-        res.data.map((item)=>{
-            this.state.usernames.push(item.Name);
-        });
-         res.data.map((item)=>{
-           var index={Name:item.Name,User_id:item.User_id};
-            this.state.nameandid.push(index);
-        });
-        // console.log(this.state.usernames);
-        // console.log(this.state.nameandid);
-        
-      });
-      
-      axios.get("/getactivity")
-      .then((res)=>{
-        this.state.activity=res.data;
-       
-         res.data.map((item)=>{
-            this.state.description.push(item.Description);
-            // console.log(this.state.description);
-        });
-         res.data.map((item)=>{
-           var index={Activity_id:item.Activity_id,Description:item.Description};
-            this.state.activityandid.push(index);
-        });
-         
-        var paymentexpanded=this.state.payment.map((payments)=>{
-            
-            for (var i=0;i<this.state.users.length;i++){
-              if (parseInt(payments.User_id) == parseInt(this.state.users[i].User_id)){
-                
-                payments["Name"]=this.state.users[i].Name;
-                // payments["Password"]=this.state.users[i].Password;
-              }
-            }
-            return payments;
-         });
-        var paymentexpandeds=paymentexpanded.map((payments)=>{
-            
-            for (var i=0;i<this.state.activity.length;i++){
-               // console.log(payments.Activity_id);
-               // console.log(this.state.activity[i].Activity_id);
-              if (parseInt(payments.Activity_id) == parseInt(this.state.activity[i].Activity_id)){
-               //  console.log(payments.Activity_id);
-               // console.log(this.state.activity[i].Activity_id);
-                payments["Description"]=this.state.activity[i].Description;
-              }
-            }
-            return payments;
-         });
-        // console.log(paymentexpandeds);
-        this.setState({
-          products:paymentexpandeds
-        });
-        // console.log(this.state.payment);
-        
-       });
+    
 
   }
   componentWillMount=(e)=>{
@@ -116,6 +32,9 @@ class Payment extends Component {
         let path = `accessdenied`;
       this.props.history.push(path);
     }
+    this.props.onfetchPaymentApi();
+    this.props.onfetchUsernameApi();
+    this.props.onfetchDescriptionApi();
       
   }
 
@@ -132,16 +51,17 @@ class Payment extends Component {
 				// console.log('delete data');
 				console.log(res);
 			});
-    var index = this.state.products.indexOf(product);
-    this.state.products.splice(index, 1);
-    this.setState(this.state.products);
+    var payment=this.props.products.payment;
+    var index = payment.indexOf(product);
+    payment.splice(index, 1);
+    this.props.onPaymentUpdate(payment);
   };
 
   handleAddEvent(evt) {
   	while(true){
   	var bool=true;
   	var id = (Math.floor(Math.random() * 999999));
-  	this.state.products.map((item)=>{
+  	this.props.products.payment.map((item)=>{
   		if(id> 1000 && id != item.Payment_id){
   			bool=true;
   		}else{
@@ -165,8 +85,9 @@ class Payment extends Component {
       Amount:"",
      
     }
-    this.state.products.unshift(product);
-    this.setState(this.state.products);
+    let products=this.props.products.payment;
+    products.unshift(product);
+    this.props.onPaymentUpdate(products);
 
   }
 
@@ -178,7 +99,7 @@ class Payment extends Component {
     };
     // console.log(item);
   		
-var products = this.state.products.slice();
+var products = this.props.products.payment.slice();
 	// console.log(products);
 
   var newProducts = products.map(function(product) {
@@ -193,7 +114,8 @@ var products = this.state.products.slice();
     }
     return product;
   });
-    this.setState({products:newProducts});
+    this.props.onPaymentUpdate(newProducts);
+    // this.setState({products:newProducts});
   //  console.log(this.state.products);
   };
 
@@ -210,7 +132,7 @@ var products = this.state.products.slice();
 
      // console.log(item);
       
-var products = this.state.products.slice();
+var products = this.props.products.payment.slice();
   // console.log(products);
 
   var newProducts = products.map(function(product) {
@@ -224,7 +146,8 @@ var products = this.state.products.slice();
     }
     return product;
   });
-    this.setState({products:newProducts});
+    this.props.onPaymentUpdate(newProducts);
+    // this.setState({products:newProducts});
   //  console.log(this.state.products);
   };
 
@@ -232,7 +155,7 @@ var products = this.state.products.slice();
     var User_id;
     var Activity_id;
   	// console.log(this.state.products);
-  	this.state.products.map((item)=>{
+  	this.props.products.payment.map((item)=>{
 
       for (var items in this.state.nameandid){
         if(this.state.nameandid[items].Name==item.Name){
@@ -277,15 +200,17 @@ var products = this.state.products.slice();
   }
 
   render() {
-
-    return (
+    
+      return (
       <div>
         <Navadmin />
         <div class="belownav"></div>
         <h2 class="title-style-1">Payment List <span class="title-under"></span></h2>
-        <ProductTable description={this.state.description} usernames={this.state.usernames} onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)}  onProductTableUpdates={this.handleProductTables.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.state.products} filterText={this.state.filterText}/>
+        <ProductTable description={this.props.description.description} usernames={this.props.usernames.username} onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)}  onProductTableUpdates={this.handleProductTables.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.props.products.payment} filterText={this.state.filterText}/>
       </div>
     );
+    
+    
 
   }
 
@@ -344,11 +269,10 @@ class ProductTable extends React.Component {
     var description=this.props.description;
     var rowDel = this.props.onRowDel;
     var filterText = this.props.filterText;
-     console.log('productss');
      
-     var product = this.props.products.map(function(product) {
-        console.log("productssss");
-        console.log(product);
+    if(this.props.products){
+      var product = this.props.products.map(function(product) {
+        
         if (product.Name){
        if (product.Name.indexOf(filterText) === -1) {
           
@@ -358,6 +282,8 @@ class ProductTable extends React.Component {
      }
       return (<ProductRow description={description} usernames={usernames} onProductTableUpdates={onProductTableUpdates} onProductTableUpdate={onProductTableUpdate} product={product} onDelEvent={rowDel.bind(this)} key={product.Payment_id}/>);
      });
+    } 
+     
 
     return (
       <div>
@@ -505,5 +431,18 @@ class EditableCells extends React.Component {
 
 }
 
+const mapStateToProps=state=>({
+  products:state.payment,
+  usernames:state.username,
+  description:state.description
+});
+const masActionsToProps={
+  onPaymentUpdate:paymentAction,
+  onUsernameUpdate:usernameAction,
+  onDescriptionUpadate:descriptionAction,
+  onfetchPaymentApi:fetchPaymentApi,
+  onfetchDescriptionApi:fetchDescriptionApi,
+  onfetchUsernameApi:fetchUsernameApi
+}
 
-export default withRouter(Payment);
+export default connect(mapStateToProps,masActionsToProps)(withRouter(Payment));

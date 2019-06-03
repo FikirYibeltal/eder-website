@@ -12,13 +12,19 @@ import thunk from 'redux-thunk';
 import messageReducer from './reducers/message-reducer';
 import userReducer from './reducers/users-reducer';
 import activityReducer from './reducers/activity-reducer';
+import paymentReducer from './reducers/payment-reducer';
+import descriptionReducer from './reducers/description-reducer';
+import usernameReducer from './reducers/username-reducer';
 //middleware
 const middlewares=[thunk];
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const allReducers=combineReducers({
 		message:messageReducer,
 		users:userReducer,
-		activity:activityReducer	
+		activity:activityReducer,
+		payment:paymentReducer,
+		username:usernameReducer,
+		description:descriptionReducer	
 });
 
 const store=createStore(allReducers,{
@@ -28,7 +34,10 @@ const store=createStore(allReducers,{
 		message:""
 	},
 	users:[],
-	activity:[]
+	activity:[],
+	payment:[],
+	username:[],
+	description:[]
 },
 
 	composeEnhancers(applyMiddleware(...middlewares))

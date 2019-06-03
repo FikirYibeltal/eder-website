@@ -163,22 +163,8 @@ var products = this.props.products.users.slice();
   }
 
 }
-// class SearchBar extends React.Component {
-//   handleChange() {
-//     this.props.onUserInput(this.refs.filterTextInput.value);
-//   }
-//   render() {
-//     return (
-//       <div>
 
-//         <input type="text" placeholder="Search Name..." value={this.props.filterText} ref="filterTextInput" onChange={this.handleChange.bind(this)}/>
 
-//       </div>
-
-//     );
-//   }
-
-// }
 
 class ProductTable extends React.Component {
 	 handleChange() {
