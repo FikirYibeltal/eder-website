@@ -1,5 +1,6 @@
 const mysql=require('mysql');
 const express=require('express');
+const jwt=require('jsonwebtoken');
 const cors=require('cors');
 let app=express();
 let bodyparser=require('body-parser');
@@ -44,7 +45,7 @@ app.use('/', express.static(__dirname + '/'))
 
     
 
-    app.post('/upload', (req, res) => {
+    app.post('/upload', verifyToken,(req, res) => {
       let uploadFile = req.files.file
       const fileName = req.files.file.name
       console.log("updated  name");
@@ -73,9 +74,47 @@ app.use('/', express.static(__dirname + '/'))
 
 
     });
+app.post('/api/posts',verifyToken,(req,res)=>{
+    jwt.verify(req.token,'ederWebsite',(err,authData)=>{
+        if (err){
+            res.sendStatus(403);
+        }else{
+            res.json({
+                post:"post created ...",
+                authData
+            });
+        }
+    })
+    
+});
+app.post('/api/login',(req,res)=>{
+    const user={
+        id:1,
+        username:'fikir',
+        email:'fikiryibeltal09@gmail.com'
+    }
+    jwt.sign({user,user},'ederWebsite',{ expiresIn:'120s'},(err,token)=>{
+        res.json({
+            token:token
+        });
+    });
+});
+function verifyToken (req,res,next){
+    const bearerHeader=req.headers['authorization'];
+    if (typeof bearerHeader!=='undefined'){
+        const bearer=bearerHeader.split(' ');
+        const bearertoken=bearer[1];
+        req.token=bearertoken;
+        next();
+
+    }else{
+        res.sendStatus(403)
+    }
+}
 
 
-app.get('/getimage',(req,res)=>{
+
+app.get('/getimage',verifyToken,(req,res)=>{
     let results=null;
     db.query("SELECT * FROM Image", function(err,result,fields){
         if(err) throw err;
@@ -91,7 +130,7 @@ app.get('/getimage',(req,res)=>{
     });
 });
 
-app.get('/image/:id',(req,res)=>{
+app.get('/image/:id',verifyToken,(req,res)=>{
     let results=null;
     console.log(req.params.id);
     db.query("SELECT * FROM Image where Image_id= ?",[req.params.id], function(err,result,fields){
@@ -110,7 +149,7 @@ app.get('/image/:id',(req,res)=>{
 
 
 
-app.get('/getallmessage',(req,res)=>{
+app.get('/getallmessage',verifyToken,(req,res)=>{
     let results=null;
     db.query("SELECT * FROM Message", function(err,result,fields){
         if(err) throw err;
@@ -125,7 +164,7 @@ app.get('/getallmessage',(req,res)=>{
     res.send(results);
     });
 });
-app.post('/addmessage',(req,res)=>{
+app.post('/addmessage',verifyToken,(req,res)=>{
     let users=req.body;
     console.log((users));
 
@@ -147,7 +186,7 @@ app.post('/addmessage',(req,res)=>{
 //     if (err) throw err;
 //     console.log(result);
 //   });
-app.get('/getalluser',(req,res)=>{
+app.get('/getalluser',verifyToken,(req,res)=>{
     let results=null;
     db.query("SELECT * FROM Users ORDER BY User_id DESC", function(err,result,fields){
         if(err) throw err;
@@ -163,7 +202,7 @@ app.get('/getalluser',(req,res)=>{
     });
 });
 
-app.get('/getusername',(req,res)=>{
+app.get('/getusername',verifyToken,(req,res)=>{
     let usernames=[];
     db.query("SELECT Name FROM Users ORDER BY User_id DESC", function(err,result,fields){
         if(err) throw err;
@@ -175,7 +214,7 @@ app.get('/getusername',(req,res)=>{
     });
 });
 
-app.get('/getdescription',(req,res)=>{
+app.get('/getdescription',verifyToken,(req,res)=>{
     let description=[];
     db.query("SELECT Description FROM Activity ORDER BY Activity_id DESC", function(err,result,fields){
         if(err) throw err;
@@ -186,7 +225,7 @@ app.get('/getdescription',(req,res)=>{
     res.send(description);
     });
 });
-app.get('/getallpost',(req,res)=>{
+app.get('/getallpost',verifyToken,(req,res)=>{
   
     db.query("SELECT * FROM Post ORDER BY Post_id DESC", function(err,result,fields){
         if(err) throw err;
@@ -199,7 +238,7 @@ app.get('/getallpost',(req,res)=>{
     });
 });
 
-app.get('/user/:id',(req,res)=>{
+app.get('/user/:id',verifyToken,(req,res)=>{
     let results=null;
     console.log(req.params.id);
     db.query("SELECT * FROM Users where User_id= ?",[req.params.id], function(err,result,fields){
@@ -217,7 +256,7 @@ app.get('/user/:id',(req,res)=>{
 });
 
 
-app.get('/getpostbyuserid/:id',(req,res)=>{
+app.get('/getpostbyuserid/:id',verifyToken,(req,res)=>{
     db.query("SELECT * FROM Post where User_id= ?",[req.params.id], function(err,result,fields){
         if(err) throw err;
         results=JSON.stringify(result);
@@ -225,7 +264,7 @@ app.get('/getpostbyuserid/:id',(req,res)=>{
     });
 });
 
-app.post('/adduser',(req,res)=>{
+app.post('/adduser',verifyToken,(req,res)=>{
     let users=req.body;
     console.log((users));
 
@@ -236,7 +275,7 @@ app.post('/adduser',(req,res)=>{
 
  });   
 
-app.post('/updateuser',(req,res)=>{
+app.post('/updateuser',verifyToken,(req,res)=>{
     let users=req.body;
     console.log((users));
 
@@ -247,7 +286,7 @@ app.post('/updateuser',(req,res)=>{
 
  });
 
-app.delete('/deleteuser/:id',(req,res)=>{
+app.delete('/deleteuser/:id',verifyToken,(req,res)=>{
    
 
     db.query("DELETE from Users where User_id=(?)",[req.params.id],(err,result,fields)=>{
@@ -261,7 +300,7 @@ app.delete('/deleteuser/:id',(req,res)=>{
 });
   
 
-app.post('/addpost',(req,res)=>{
+app.post('/addpost',verifyToken,(req,res)=>{
     let users=req.body;
     console.log((users));
 
@@ -271,7 +310,7 @@ app.post('/addpost',(req,res)=>{
     });
   });
 
-app.delete('/deletepost/:id',(req,res)=>{
+app.delete('/deletepost/:id',verifyToken,(req,res)=>{
    
 
     db.query("DELETE from Post where User_id=(?)",[req.params.id],(err,result,fields)=>{
@@ -287,7 +326,7 @@ app.delete('/deletepost/:id',(req,res)=>{
 
 
 
-app.get('/getactivity',(req,res)=>{
+app.get('/getactivity',verifyToken,(req,res)=>{
     let results=null;
     db.query("SELECT * FROM Activity ORDER BY Activity_id DESC", function(err,result,fields){
         if(err) throw err;
@@ -304,7 +343,7 @@ app.get('/getactivity',(req,res)=>{
 });
 
 
-app.get('/getpayment',(req,res)=>{
+app.get('/getpayment',verifyToken,(req,res)=>{
     let results=null;
     db.query("SELECT * FROM Payment ORDER BY Payment_id DESC", function(err,result,fields){
         if(err) throw err;
@@ -321,7 +360,7 @@ app.get('/getpayment',(req,res)=>{
 
     
 });
-app.get('/getpaymentleftjoined',(req,res)=>{
+app.get('/getpaymentleftjoined',verifyToken,(req,res)=>{
     let results=null;
     db.query("SELECT Payment.*,Users.Name,Activity.Description FROM Payment LEFT JOIN Users ON Users.User_id=Payment.User_id LEFT JOIN Activity ON Activity.Activity_id=Payment.Activity_id ORDER BY Payment_id DESC", function(err,result,fields){
         if(err) throw err;
@@ -334,7 +373,7 @@ app.get('/getpaymentleftjoined',(req,res)=>{
 
 
 
-app.post('/addactivity',(req,res)=>{
+app.post('/addactivity',verifyToken,(req,res)=>{
     let users=req.body;
     console.log((users));
 
@@ -345,7 +384,7 @@ app.post('/addactivity',(req,res)=>{
 
  }); 
 
-app.post('/addpayment',(req,res)=>{
+app.post('/addpayment',verifyToken,(req,res)=>{
     let users=req.body;
     console.log((users));
 
@@ -356,7 +395,7 @@ app.post('/addpayment',(req,res)=>{
 
  });
 
-app.delete('/deleteactivity/:id',(req,res)=>{
+app.delete('/deleteactivity/:id',verifyToken,(req,res)=>{
    
 
     db.query("DELETE from Activity where Activity_id=(?)",[req.params.id],(err,result,fields)=>{
@@ -370,7 +409,7 @@ app.delete('/deleteactivity/:id',(req,res)=>{
 });
 
 
-app.delete('/deletepayment/:id',(req,res)=>{
+app.delete('/deletepayment/:id',verifyToken,(req,res)=>{
    
 
     db.query("DELETE from Payment where Payment_id=(?)",[req.params.id],(err,result,fields)=>{
@@ -383,7 +422,7 @@ app.delete('/deletepayment/:id',(req,res)=>{
 
 });
 
-app.post('/updateactivity',(req,res)=>{
+app.post('/updateactivity',verifyToken,(req,res)=>{
     let users=req.body;
     console.log((users));
 
@@ -393,7 +432,7 @@ app.post('/updateactivity',(req,res)=>{
     });
 
  });
-app.post('/updatepayment',(req,res)=>{
+app.post('/updatepayment',verifyToken,(req,res)=>{
     let users=req.body;
     console.log((users));
 
