@@ -4,20 +4,41 @@ import Navs from './Navs.js';
 import Topnav from './Topnav.js';
 import Footer from './Footer.js';
 import axios from 'axios';
+import verifytoken from './extra/Verifytoken';
 import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
 class Eventpage extends Component {
 
     constructor(props){
       super(props);
       this.state={
-        products:[]
+        products:[],
+        authenticateduser:[]
 
       };
       
+      
     }
 
+    componentWillMount=(e)=>{
+           let token=localStorage.getItem('token');
+            if(verifytoken(token)){
+                 let users=verifytoken(token);
+                let user=this.state.authenticateduser;
+                 this.setState({
+                     authenticateduser:[...user,users]
+                 });
+            }else{
+
+              let path = `accessdenied`;
+              this.props.history.push(path);
+
+            }
+          }
+
      componentDidMount=(e)=>{
-    axios.get("/getallpost")
+      let token=localStorage.getItem('token');
+      let config={headers:{Authorization:`Bearer ${token}`}};
+    axios.get("/api/getallpost",config)
       .then((res)=>{
         console.log(res);
 

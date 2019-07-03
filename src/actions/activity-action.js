@@ -10,8 +10,9 @@ export function activityAction(activity){
 }
 
 export function fetchActivityApi(){
+	let token=localStorage.getItem('token');
 	return dispatch=>{
-		axios.get('/getActivity')
+		axios.get('/api/getActivity',{headers:{Authorization:`Bearer ${token}`}})
 			.then((res)=>{
 				dispatch(activityAction(res.data));
 			});

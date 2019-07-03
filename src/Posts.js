@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import ReactHtmlParser, { processNodes, convertNodeToElement, htmlparser2 } from 'react-html-parser';
+import ReactHtmlParser from 'react-html-parser';
 import Navadmin from './Navadmin.js';
 import {withRouter} from 'react-router-dom';
 import UserProfile from './LoginEnclosure.js';
+import verifytoken from './extra/Verifytoken';
 class Posts extends Component {
      constuctor() {
           this.routeChange = this.routeChange.bind(this);
@@ -12,32 +13,52 @@ class Posts extends Component {
       super(props);
       this.state={
         products:[],
-        user:[]
-
+        user:[],
+        authenticateduser:[]
       };
      
       
     }
     componentWillMount=(e)=>{
-    console.log(UserProfile.getName());
-    if(!UserProfile.getName() || UserProfile.getName()==""){
+      let token=localStorage.getItem('token');
+      if(verifytoken(token)){
+          //console.log('verifytoken');
+          //console.log(verifytoken(token));
+          //console.log(typeof(verifytoken(token)));
+           let users=verifytoken(token);
+
+          //console.log('verifyuser');
+          //console.log(users);
+          let user=this.state.authenticateduser;
+           this.setState({
+               authenticateduser:[...user,users]
+           });
+      }else{
+
         let path = `accessdenied`;
-      this.props.history.push(path);
-    }
-    var urls=`/user/${UserProfile.getId()}`;
-      axios.get(urls)
-      .then((res)=>{
-          console.log(res);
-          this.setState({
-            user:res.data
-          })
-          console.log(this.state.user);
-      });
+        this.props.history.push(path);
+
+      }
+    // console.log(UserProfile.getName());
+    // if(!UserProfile.getName() || UserProfile.getName()==""){
+    //     let path = `accessdenied`;
+    //   this.props.history.push(path);
+    // }
+    // var urls=`/user/${UserProfile.getId()}`;
+    //   axios.get(urls)
+    //   .then((res)=>{
+    //       console.log(res);
+    //       this.setState({
+    //         user:res.data
+    //       })
+    //       console.log(this.state.user);
+    //   });
       
   }
 
      componentDidMount=(e)=>{
-    axios.get("/getallpost")
+      let token=localStorage.getItem('token');
+      axios.get("/api/getallpost",{headers:{Authorization:`Bearer ${token}`}})
       .then((res)=>{
         console.log(res);
 
@@ -60,10 +81,10 @@ class Posts extends Component {
      
          return(
           <div>
-          <Navadmin />
+          <Navadmin authenticateduser={this.state.authenticateduser}/>
           <div class="belownav"></div>
           <h2 class="title-style-1">Posts from Board <span class="title-under"></span></h2>
-          <Eachposts products={this.state.products} user={this.state.user}/>
+          <Eachposts products={this.state.products} user={this.state.authenticateduser}/>
           </div>
 
         );

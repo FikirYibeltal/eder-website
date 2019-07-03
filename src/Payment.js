@@ -12,6 +12,9 @@ import {connect} from 'react-redux';
 import {paymentAction,fetchPaymentApi} from './actions/payment-action';
 import {usernameAction,fetchUsernameApi} from './actions/username-action';
 import {descriptionAction,fetchDescriptionApi} from './actions/description-action';
+import {fetchActivityApi,activityAction} from './actions/activity-action';
+import { fetchApi,updateUser } from './actions/user-action';
+import verifytoken from './extra/Verifytoken';
 class Payment extends Component {
    constuctor() {
           this.routeChange = this.routeChange.bind(this);
@@ -23,15 +26,28 @@ class Payment extends Component {
     this.state = {};
     this.state.filterText = "";
     
-    
+    this.state.authenticateduser=[];
 
   }
   componentWillMount=(e)=>{
-    console.log(UserProfile.getName());
-    if(!UserProfile.getName() || UserProfile.getName()==""){
+    let token=localStorage.getItem('token');
+      if(verifytoken(token)){
+           let users=verifytoken(token);
+          let user=this.state.authenticateduser;
+           this.setState({
+               authenticateduser:[...user,users]
+           });
+      }else{
+
         let path = `accessdenied`;
-      this.props.history.push(path);
-    }
+        this.props.history.push(path);
+
+      }
+    // console.log(UserProfile.getName());
+    // if(!UserProfile.getName() || UserProfile.getName()==""){
+    //     let path = `accessdenied`;
+    //   this.props.history.push(path);
+    // }
     this.props.onfetchPaymentApi();
     this.props.onfetchUsernameApi();
     this.props.onfetchDescriptionApi();
@@ -45,8 +61,9 @@ class Payment extends Component {
   };
   handleRowDel(product) {
   	// console.log(product);
-  	
-  	axios.delete(`/deletepayment/${product.Payment_id}`)
+  	let token=localStorage.getItem('token');
+    let config={headers:{Authorization:`Bearer ${token}`}};
+  	axios.delete(`/api/deletepayment/${product.Payment_id}`,config)
 			.then((res)=>{
 				// console.log('delete data');
 				console.log(res);
@@ -151,44 +168,48 @@ var products = this.props.products.payment.slice();
   //  console.log(this.state.products);
   };
 
-  updatedatabase(e){
+   async updatedatabase(e){
+    let token=localStorage.getItem('token');
+    let config={headers:{Authorization:`Bearer ${token}`}};
     var User_id;
     var Activity_id;
   	// console.log(this.state.products);
-  	this.props.products.payment.map((item)=>{
+    await this.props.onfetchActivityApi();
+    await this.props.onFetchApi();
+  	await this.props.products.payment.map((item)=>{
 
-      for (var items in this.state.nameandid){
-        if(this.state.nameandid[items].Name==item.Name){
-          User_id=this.state.nameandid[items].User_id;
+      for (var items in this.props.users.users){
+        if(this.props.users.users[items].Name==item.Name){
+          User_id=this.props.users.users[items].User_id;
         }
       }
-      for (var items in this.state.activityandid){
-        if(this.state.activityandid[items].Description==item.Description){
-          Activity_id=this.state.activityandid[items].Activity_id;
+      for (var items in this.props.activity.activity){
+        if(this.props.activity.activity[items].Description==item.Description){
+          Activity_id=this.props.activity.activity[items].Activity_id;
         }
       }
       console.log(User_id);
       console.log(Activity_id);
   		if(parseInt(item.Payment_id)<1000){
   			
-  			axios.post('/updatepayment', {
+  			axios.post('/api/updatepayment', {
 			    Payment_id: item.Payment_id,
 			    User_id: User_id,
 			    Activity_id: Activity_id,
 			    Amount: item.Amount,
 			    
-			  }).then((res,err)=>{
+			  },config).then((res,err)=>{
 			  	console.log(err);
 			  });
 			  
   		}
   		else{
-  			axios.post('/addpayment', {
+  			axios.post('/api/addpayment', {
 			    
 			    User_id: User_id,
           Activity_id: Activity_id,
           Amount: item.Amount,
-			  }).then((res,err)=>{
+			  },config).then((res,err)=>{
 			  	console.log(err);
 			  });
   			
@@ -434,7 +455,9 @@ class EditableCells extends React.Component {
 const mapStateToProps=state=>({
   products:state.payment,
   usernames:state.username,
-  description:state.description
+  description:state.description,
+  users:state.users,
+  activity:state.activity
 });
 const masActionsToProps={
   onPaymentUpdate:paymentAction,
@@ -442,7 +465,11 @@ const masActionsToProps={
   onDescriptionUpadate:descriptionAction,
   onfetchPaymentApi:fetchPaymentApi,
   onfetchDescriptionApi:fetchDescriptionApi,
-  onfetchUsernameApi:fetchUsernameApi
+  onfetchUsernameApi:fetchUsernameApi,
+  onFetchApi:fetchApi,
+  onUpdateUser:updateUser,
+  onfetchActivityApi:fetchActivityApi,
+  onActivityUpdate:activityAction
 }
 
 export default connect(mapStateToProps,masActionsToProps)(withRouter(Payment));

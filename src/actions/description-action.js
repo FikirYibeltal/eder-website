@@ -8,8 +8,10 @@ export function descriptionAction (description){
 		}
 }
 export function fetchDescriptionApi(){
+	let token=localStorage.getItem('token');
+    let config={headers:{Authorization:`Bearer ${token}`}};
 	return dispatch=>{
-		axios.get('/getdescription')
+		axios.get('/api/getdescription',config)
 			.then((res)=>{
 				dispatch(descriptionAction(res.data));
 			});

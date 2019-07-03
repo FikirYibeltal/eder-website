@@ -8,6 +8,7 @@ import axios from 'axios';
 import Navadmin from './Navadmin.js';
 import {withRouter} from 'react-router-dom';
 import UserProfile from './LoginEnclosure.js';
+import verifytoken from './extra/Verifytoken';
 import './Addpost.css';
 
       class Addpost extends React.Component {
@@ -24,7 +25,8 @@ import './Addpost.css';
             loaded: 0,
             numberdates:"",
             counter:0,
-            editorContentHtml:""
+            editorContentHtml:"",
+            authenticateduser:[]
            };
 
           this.focus = () => this.refs.editor.focus();
@@ -53,12 +55,24 @@ import './Addpost.css';
         }
 
         componentWillMount=(e)=>{
-    console.log(UserProfile.getName());
-    if(!UserProfile.getName() || UserProfile.getName()==""){
-        let path = `accessdenied`;
-      this.props.history.push(path);
-    }
-      
+    // console.log(UserProfile.getName());
+    // if(!UserProfile.getName() || UserProfile.getName()==""){
+    //     let path = `accessdenied`;
+    //   this.props.history.push(path);
+    // }
+          let token=localStorage.getItem('token');
+            if(verifytoken(token)){
+                 let users=verifytoken(token);
+                let user=this.state.authenticateduser;
+                 this.setState({
+                     authenticateduser:[...user,users]
+                 });
+            }else{
+
+              let path = `accessdenied`;
+              this.props.history.push(path);
+
+            }    
   }
         
         _handleKeyCommand(command) {
@@ -94,25 +108,26 @@ import './Addpost.css';
           );
         }
         updatedatabase=()=>{
-
-          axios.get(`/image/${this.state.numberdates}`)
+          let token=localStorage.getItem('token');
+          let config={headers:{Authorization:`Bearer ${token}`}};
+          axios.get(`/api/image/${this.state.numberdates}`,config)
             .then((res)=>{
-              console.log(res.data[0].Image);
-              console.log(this.state.editorContentHtml);
-              console.log(this.state.Types);
-              console.log(this.state.To);
+              // console.log(res.data[0].Image);
+              // console.log(this.state.editorContentHtml);
+              // console.log(this.state.Types);
+               console.log(this.state.authenticateduser);
               if(res.data[0].Image){
 
-                  axios.post('/addpost',{
+                  axios.post('/api/addpost',{
                       Text:this.state.editorContentHtml,
                       Image:this.state.numberdates,
                       Type:this.state.Types,
-                      User_id:1,
+                      User_id:this.state.authenticateduser[0].User_id,
                       Too:this.state.To
 
 
 
-                    }).then((res)=>{
+                    },config).then((res)=>{
                         console.log(res);
                     });
               }
@@ -185,6 +200,8 @@ import './Addpost.css';
             console.log(numberdates);
           }
           handleUpload = () => {
+              let token=localStorage.getItem('token');
+              let config={headers:{Authorization:`Bearer ${token}`}};
               if(this.state.counter== 1){            
                   const data = new FormData()
                   console.log(data);
@@ -194,12 +211,12 @@ import './Addpost.css';
                   
                   // console.log(JSON.stringify(data));
                   console.log("upload start");
-                  axios.post('/upload', data, {
+                  axios.post('/api/upload', data, {
                       onUploadProgress: ProgressEvent => {
                         this.setState({
                           loaded: (ProgressEvent.loaded / ProgressEvent.total*100),
                         })
-                      },
+                      },headers:{Authorization:`Bearer ${token}`}
                     })
                     .then(res => {
                       console.log(res.statusText)

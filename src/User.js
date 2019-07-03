@@ -8,6 +8,7 @@ import {withRouter} from 'react-router-dom';
 import {connect} from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { fetchApi,updateUser } from './actions/user-action';
+import verifytoken from './extra/Verifytoken';
 class User extends Component {
   constuctor() {
           this.routeChange = this.routeChange.bind(this);
@@ -21,14 +22,30 @@ class User extends Component {
     this.state.products = [
       
     ];
+    this.state.authenticateduser=[];
 
   }
   componentWillMount=(e)=>{
     //console.log(UserProfile.getName());
-    if(!UserProfile.getName() || UserProfile.getName()==""){
+    let token=localStorage.getItem('token');
+      if(verifytoken(token)){
+           let users=verifytoken(token);
+          let user=this.state.authenticateduser;
+           this.setState({
+               authenticateduser:[...user,users]
+           });
+      }else{
+
         let path = `accessdenied`;
-      this.props.history.push(path);
-    }
+        this.props.history.push(path);
+
+      }
+
+
+    // if(!UserProfile.getName() || UserProfile.getName()==""){
+    //     let path = `accessdenied`;
+    //   this.props.history.push(path);
+    // }
      this.props.onFetchApi(); 
   }
 
@@ -36,9 +53,11 @@ class User extends Component {
     this.setState({filterText: filterText});
   };
   handleRowDel(product) {
+    let token=localStorage.getItem('token');
+    let config={headers:{Authorization:`Bearer ${token}`}};
   	// console.log(product);
   	// console.log('/deleteuser/'+product.User_id);
-  	axios.delete(`/deleteuser/${product.User_id}`)
+  	axios.delete(`/api/deleteuser/${product.User_id}`,config)
 			.then((res)=>{
 				//console.log('delete data');
 				//console.log(res);
@@ -115,32 +134,35 @@ var products = this.props.products.users.slice();
    };
 
   updatedatabase(e){
+    let token=localStorage.getItem('token');
+    let config={headers:{Authorization:`Bearer ${token}`}};
   	// console.log(this.state.products);
   	this.props.products.users.map((item)=>{
   		if(parseInt(item.User_id)<1000){
   			
-  			axios.post('/updateuser', {
+  			axios.post('/api/updateuser',{
 			    User_id: item.User_id,
 			    Name: item.Name,
 			    Email: item.Email,
 			    Mobile: item.Mobile,
 			    Password: item.Password,
 			    Type: item.Type
-			  }).then((res,err)=>{
+			  },config).then((res,err)=>{
 			  	//console.log(err);
 			  });
 			  
   		}
   		else{
-  			axios.post('/adduser', {
+  			axios.post('/api/adduser',{
 			    
 			    Name: item.Name,
 			    Email: item.Email,
 			    Mobile:item.Mobile,
 			    Password: item.Password,
 			    Type: parseInt(item.Type)
-			  }).then((res,err)=>{
+			  },config).then((res,err)=>{
 			  	//console.log(err);
+          console.log(err)
 			  });
   			
   		}
@@ -153,7 +175,7 @@ var products = this.props.products.users.slice();
   render() {
     return (
       <div>
-        <Navadmin />
+        <Navadmin authenticateduser={this.state.authenticateduser} />
         <div class="belownav"></div>
         <h2 class="title-style-1">Members List <span class="title-under"></span></h2>
         <ProductTable  onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.props.products.users} filterText={this.state.filterText}/>

@@ -8,8 +8,10 @@ export function usernameAction (username){
 		}
 }
 export function fetchUsernameApi(){
+	let token=localStorage.getItem('token');
+    let config={headers:{Authorization:`Bearer ${token}`}};
 	return dispatch=>{
-		axios.get('/getusername')
+		axios.get('/api/getusername',config)
 			.then((res)=>{
 				dispatch(usernameAction(res.data));
 			});

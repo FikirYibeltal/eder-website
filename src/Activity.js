@@ -7,6 +7,7 @@ import {withRouter} from 'react-router-dom';
 import UserProfile from './LoginEnclosure.js';
 import {connect} from 'react-redux';
 import {fetchActivityApi,activityAction} from './actions/activity-action';
+import verifytoken from './extra/Verifytoken';
 class Activity extends Component {
    constuctor() {
           this.routeChange = this.routeChange.bind(this);
@@ -17,14 +18,28 @@ class Activity extends Component {
     //  this.state.products = [];
     this.state = {};
     this.state.filterText = "";
+    this.state.authenticateduser=[];
     
   }
   componentWillMount=(e)=>{
-    console.log(UserProfile.getName());
-    if(!UserProfile.getName() || UserProfile.getName()==""){
+    let token=localStorage.getItem('token');
+      if(verifytoken(token)){
+           let users=verifytoken(token);
+          let user=this.state.authenticateduser;
+           this.setState({
+               authenticateduser:[...user,users]
+           });
+      }else{
+
         let path = `accessdenied`;
-      this.props.history.push(path);
-    }
+        this.props.history.push(path);
+
+      }
+    // console.log(UserProfile.getName());
+    // if(!UserProfile.getName() || UserProfile.getName()==""){
+    //     let path = `accessdenied`;
+    //   this.props.history.push(path);
+    // }
      this.props.onfetchActivityApi(); 
   }
 
@@ -32,9 +47,11 @@ class Activity extends Component {
     this.setState({filterText: filterText});
   };
   handleRowDel(product) {
-    console.log(product);
-    console.log('/deleteactivity/'+product.Activity_id);
-    axios.delete(`/deleteactivity/${product.Activity_id}`)
+    let token=localStorage.getItem('token');
+    let config={headers:{Authorization:`Bearer ${token}`}};
+    // console.log(product);
+    // console.log('/deleteactivity/'+product.Activity_id);
+    axios.delete(`/api/deleteactivity/${product.Activity_id}`,config)
       .then((res)=>{
         console.log('delete data');
         console.log(res);
@@ -106,27 +123,29 @@ var products = this.props.products.activity.slice();
   };
 
   updatedatabase(e){
+    let token=localStorage.getItem('token');
+    let config={headers:{Authorization:`Bearer ${token}`}};
     // console.log(this.state.products);
     this.props.products.activity.map((item)=>{
       if(parseInt(item.Activity_id)<1000){
         
-        axios.post('/updateactivity', {
+        axios.post('/api/updateactivity', {
           Activity_id: item.Activity_id,
           Description: item.Description,
           Minimum: item.Minimum,
           
-        }).then((res,err)=>{
+        },config).then((res,err)=>{
           console.log(err);
         });
         
       }
       else{
-        axios.post('/addactivity', {
+        axios.post('/api/addactivity', {
           
           Description: item.Description,
           Minimum: item.Minimum,
           
-        }).then((res,err)=>{
+        },config).then((res,err)=>{
           console.log(err);
         });
         

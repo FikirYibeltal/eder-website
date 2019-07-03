@@ -9,8 +9,9 @@ export function updateUser(user){
 	}
 }
 export function fetchApi(){
+	let token=localStorage.getItem('token');
 	return dispatch=>{
-		axios.get('/getalluser')
+		axios.get('/api/getalluser',{headers:{Authorization:`Bearer ${token}`}})
 		.then((res)=>{
 			dispatch(updateUser(res.data));
 		});

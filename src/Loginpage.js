@@ -2,15 +2,11 @@ import React, { Component } from 'react';
 import Navs from './Navs.js';
 import Topnav from './Topnav.js';
 import UserProfile from './LoginEnclosure.js';
-import {
-  Switch,
-  Route,
-  NavLink,
-  HashRouter,
-  withRouter
-} from "react-router-dom";
+import {withRouter} from "react-router-dom";
 import axios from 'axios';
-
+import jwt from 'jsonwebtoken';
+import decode from 'jwt-decode';
+import verifytoken from './extra/Verifytoken';
 class Loginpage extends Component{
 		
 		 constuctor() {
@@ -23,27 +19,87 @@ class Loginpage extends Component{
 	
 	handleClick=(e)=>{
 		e.preventDefault();
-		console.log(e);
-		axios.get(`/getalluser`)
-		.then(res=>{
-		var item;
-		 for (item in res.data){
-	       // console.log(res.data[item].Name);
-	       if (this.state.email==res.data[item].Email && this.state.password == res.data[item].Password){
-	       		 // console.log(res.data[item].User_id);
-	       		UserProfile.setName(this.state.email);
-	       		UserProfile.setId(res.data[item].User_id);
-	       		// console.log(UserProfile.getName());
-	       		// console.log(UserProfile.getId());
-	       		let path = `posts`;
-    			this.props.history.push(path);
-	   }
-	}
+		// console.log(e);
+		var token=localStorage.getItem('token');
+		console.log(token);
+		if(token){
+				var decoded=verifytoken(token);
+				// console.log(decoded);
+				if(decoded){
+					console.log(decoded);
+					let path = `posts`;
+    			 	this.props.history.push(path);
+    			 	localStorage.setItem('path',path);
+    			 }else{
+    			 	let path = `login`;
+    			 	this.props.history.push(path);
+    			 	localStorage.setItem('path',path);
+    			 }
+				// var current_time = new Date().getTime() / 1000;
+				
+				// var decoded = decode(token);
+				// if(current_time<decoded.exp){
+				// 	console.log(decoded);
+				// 	UserProfile.setName(decoded.user.Name);
+	   //     			UserProfile.setId(decoded.user.User_id);
+	   //      		let path = `posts`;
+    // 			 	this.props.history.push(path);
+				// }else{
 
-		})
-		.catch(function (error) {
-    		console.log(error);
- 	 });
+				// }
+				
+		}else{
+			axios.post('/login',{
+				Email:this.state.email,
+				Password:this.state.password})
+				    .then((res,err)=>{
+					let token=undefined;
+					if (res.data.length!=0){
+						token=`${res.data.token}`;
+						localStorage.setItem('token',`${res.data.token}`);
+					}else{
+						console.log('it doesnot exist');
+					}
+					if (token){
+							var decoded=verifytoken(token);
+							if(decoded){
+							console.log(decoded);
+							let path = `posts`;
+		    			 	this.props.history.push(path);
+		    			 	localStorage.setItem('path',path)
+		    			 }else{
+		    			 	let path = `login`;
+		    			 	this.props.history.push(path);
+		    			 	localStorage.setItem('path',path);
+		    			 }
+						
+							
+					}
+				
+					})
+					.catch((err)=>{
+						console.log(err);
+					})
+		}
+		 
+	// 	axios.get(`/getalluser`)
+	// 	.then(res=>{
+	// 	var item;
+	// 	 for (item in res.data){
+	//         console.log(res.data[item].Name);
+	//        if (this.state.email==res.data[item].Email && this.state.password == res.data[item].Password){
+	//        		  console.log(res.data[item].User_id);
+	//        		UserProfile.setName(this.state.email);
+	//        		UserProfile.setId(res.data[item].User_id);
+	//         		let path = `posts`;
+ //    			 this.props.history.push(path);
+	//    }
+	// }
+
+	// 	})
+	// 	.catch(function (error) {
+ //    		console.log(error);
+ // 	 });
 	}
 	handleEmail=(e)=>{
 		this.setState({

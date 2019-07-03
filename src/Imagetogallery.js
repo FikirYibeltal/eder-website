@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { confirmAlert } from 'react-confirm-alert';
 import axios from 'axios';
 import Navadmin from './Navadmin.js';
+import verifytoken from './extra/Verifytoken';
 // import './Testpage6.css';
 
       class Imagetogallery extends React.Component {
@@ -13,9 +14,26 @@ import Navadmin from './Navadmin.js';
             loaded: 0,
             numberdates:"",
             counter:0,
+            authenticateduser:[]
 
           };
         }
+
+         componentWillMount=(e)=>{
+           let token=localStorage.getItem('token');
+            if(verifytoken(token)){
+                 let users=verifytoken(token);
+                let user=this.state.authenticateduser;
+                 this.setState({
+                     authenticateduser:[...user,users]
+                 });
+            }else{
+
+              let path = `accessdenied`;
+              this.props.history.push(path);
+
+            }
+          }
 
 
         handleselectedFile = (event) => {
@@ -39,6 +57,7 @@ import Navadmin from './Navadmin.js';
             console.log(numberdates);
           }
           handleUpload = () => {
+              let token=localStorage.getItem('token');
               if(this.state.counter== 1){            
                   const data = new FormData()
                   console.log(data);
@@ -48,12 +67,12 @@ import Navadmin from './Navadmin.js';
                   
                   // console.log(JSON.stringify(data));
                   console.log("upload start");
-                  axios.post('/upload', data, {
+                  axios.post('/api/upload', data, {
                       onUploadProgress: ProgressEvent => {
                         this.setState({
                           loaded: (ProgressEvent.loaded / ProgressEvent.total*100),
                         })
-                      },
+                      },headers:{Authorization:`Bearer ${token}`}
                     })
                     .then(res => {
                       console.log(res.statusText)

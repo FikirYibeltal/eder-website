@@ -28,15 +28,13 @@ class Navadmin extends Component{
 			user:[]
 		}
 		componentWillMount=(e)=>{
+
 			var urls=`/user/${UserProfile.getId()}`;
 	      axios.get(urls)
 	      .then((res)=>{
-	          //console.log(res);
 	          this.setState({
 	            user:res.data
 	          });
-	          //console.log('component')
-	          //console.log(this.state.user);
 	      });
 
 			
@@ -66,7 +64,6 @@ class Navadmin extends Component{
 			    	let path = ``;
     				this.props.history.push(path);
 			    }
-
 	       		
 	   }
 	

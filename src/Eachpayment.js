@@ -5,6 +5,9 @@ import 'react-confirm-alert/src/react-confirm-alert.css';
 import Navadmin from './Navadmin.js';
 import {withRouter} from 'react-router-dom';
 import UserProfile from './LoginEnclosure.js';
+import verifytoken from './extra/Verifytoken';
+import {connect} from 'react-redux';
+import {fetchPaymentApi} from './actions/payment-action';
 class Activity extends Component {
    constuctor() {
           this.routeChange = this.routeChange.bind(this);
@@ -18,17 +21,28 @@ class Activity extends Component {
     this.state.products = [
       
     ];
-    this.state.payments=[
+    this.state.authenticateduser=[
 
     ];
+    this.state.payments=[];
 
   }
   componentWillMount=(e)=>{
-    console.log(UserProfile.getName());
-    if(!UserProfile.getName() || UserProfile.getName()==""){
+     let token=localStorage.getItem('token');
+      if(verifytoken(token)){
+           let users=verifytoken(token);
+          let user=this.state.authenticateduser;
+           this.setState({
+               authenticateduser:[...user,users]
+           });
+      }else{
+
         let path = `accessdenied`;
-      this.props.history.push(path);
-    }
+        this.props.history.push(path);
+
+      }
+    
+    //this.props.onfetchPaymentApi();
      axios.get("/getactivity")
       .then((res)=>{
         console.log(res);
@@ -53,8 +67,8 @@ class Activity extends Component {
         this.setState({
           payments:payment
         });
-        console.log(this.state.products);
-        console.log(this.state.payments);
+        // console.log(this.state.products);
+        // console.log(this.state.payments);
 
           var productsextended=this.state.products.map((item)=>{
           for(var x=0;x<this.state.payments.length;x++){
@@ -68,7 +82,7 @@ class Activity extends Component {
           }
           return item;
         });
-          console.log(productsextended);
+          //console.log(productsextended);
         this.setState({
           products:productsextended
         })
@@ -288,6 +302,11 @@ class EditableCell extends React.Component {
   }
 
 }
+const mapStateToProps=state=>({
+  products:state.payment
+})
+const mapActionsToProps={
+  onfetchPaymentApi:fetchPaymentApi
+}
 
-
-export default withRouter(Activity);
+export default connect(mapStateToProps,mapActionsToProps)(withRouter(Activity));

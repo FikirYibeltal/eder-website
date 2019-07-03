@@ -8,9 +8,13 @@ export function paymentAction (payment){
 		}
 }
 export function fetchPaymentApi(){
+	let token=localStorage.getItem('token');
+    let config={headers:{Authorization:`Bearer ${token}`}};
 	return dispatch=>{
-		axios.get('/getpaymentleftjoined')
+		axios.get('/api/getpaymentleftjoined',config)
 			.then((res)=>{
+				console.log('getpaymentleftjoined');
+				console.log(res.data);
 				dispatch(paymentAction(res.data));
 			});
 	}

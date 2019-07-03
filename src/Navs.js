@@ -20,7 +20,7 @@ class Navs extends Component{
 				contact:"nav-item"
 		}
 		componentWillMount=(e)=>{
-			console.log(UserProfile.getNav());
+		//console.log(UserProfile.getNav());
       	if(UserProfile.getNav()==""){
       		this.setState({
       			home:"nav-item active"
@@ -33,36 +33,21 @@ class Navs extends Component{
 	 }
 
 		handleclick=(e)=>{
-			// console.log(e);
+			
 			UserProfile.setNav(e);
-			// console.log("enclosure");
-			console.log(UserProfile.getNav());
+
+			//console.log(UserProfile.getNav());
 			for (var item in this.state){
 
-				console.log(item)
+				//console.log(item)
 				if (item == e){
-					// console.log("match");
-					// console.log(item);
-
 					var stateObject = function() {
 				      var returnObj = {};
 				      returnObj[item] = "nav-item active";
 				         return returnObj;
 				    }.bind(e)();
-
-				    this.setState( stateObject ); 
-					// this.setState({
-					// 	item.value:"nav-item active"
-					// });
+				    this.setState( stateObject ); 	
 				} 
-				// else if(item=="active"){
-
-
-				// }else{
-				// 	this.setState({
-				// 		item:"nav-item"
-				// 	})
-				// }
 			}
 			console.log(this.state);
 		}
