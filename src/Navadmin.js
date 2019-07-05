@@ -28,42 +28,31 @@ class Navadmin extends Component{
 			user:[]
 		}
 		componentWillMount=(e)=>{
-
-			var urls=`/user/${UserProfile.getId()}`;
-	      axios.get(urls)
-	      .then((res)=>{
-	          this.setState({
-	            user:res.data
-	          });
-	      });
-
-			
-      	var name=UserProfile.getName().charAt(0).toUpperCase();
-      	this.setState({
-      		username:name
-      	});
-      	 
-
-
-
+			console.log(this.props.authenticateduser);
+			var name=this.props.authenticateduser[0].Name.charAt(0).toUpperCase();
+			this.setState({
+      			username:name
+      		});      	 
 	 }
 
 		handleclick=(e)=>{
-
+			localStorage.setItem('path',e);
 		}
 
 		onclick=(e)=>{
 
 				e.preventDefault();
-			    UserProfile.setName("");
-	       		UserProfile.setId("");
-	       		if((!UserProfile.getName() || UserProfile.getNav()=="") && UserProfile.getNav()!='home'){
-			        let path = UserProfile.getNav();
-			      	this.props.history.push(path);
-			    }else{
-			    	let path = ``;
-    				this.props.history.push(path);
-			    }
+				localStorage.removeItem('token');
+				localStorage.setItem('path','');
+				this.props.history.push('');
+				
+	      //  		if((!localStorage.getItem('publicpath') || UserProfile.getNav()=="") && UserProfile.getNav()!='home'){
+			    //     let path = UserProfile.getNav();
+			    //   	this.props.history.push(path);
+			    // }else{
+			    // 	let path = ``;
+    			// 	this.props.history.push(path);
+			    // }
 	       		
 	   }
 	
@@ -74,7 +63,7 @@ class Navadmin extends Component{
 		//console.log('state');
 		//console.log(this.state.user);
 		//console.log('statess')
-		let user=this.state.user;
+		let user=this.props.authenticateduser;
 		 if(user.length!=0){
 		 				//console.log('hello1');
 						
@@ -98,7 +87,7 @@ class Navadmin extends Component{
 						        
 					             <NavLink to="/payment"  onClick={()=>this.handleclick("payment")} class={this.state.payment}>Update Payments</NavLink>
 					             
-						        <NavLink to="/eachpayment"  onClick={()=>this.handleclick("payment")} class={this.state.payment}>Your Payments</NavLink>
+						        <NavLink to="/eachpayment"  onClick={()=>this.handleclick("eachpayment")} class={this.state.payment}>Your Payments</NavLink>
 						        
 						      </div>
 						    </li>
@@ -109,9 +98,9 @@ class Navadmin extends Component{
 						      </a>
 						      <div class="dropdown-menu">
 						        
-					             <NavLink to="/addpost"  onClick={()=>this.handleclick("post")} class={this.state.post}>Add Post</NavLink>
+					             <NavLink to="/addpost"  onClick={()=>this.handleclick("addpost")} class={this.state.post}>Add Post</NavLink>
 					             
-						        <NavLink to="/posts"  onClick={()=>this.handleclick("post")} class={this.state.post}>See Posts</NavLink>
+						        <NavLink to="/posts"  onClick={()=>this.handleclick("posts")} class={this.state.post}>See Posts</NavLink>
 						        <NavLink to="/uploadimage"  onClick={()=>this.handleclick("post")} class={this.state.post}>Upload Image to Gallery</NavLink>
 						       
 						      </div>
@@ -129,10 +118,10 @@ class Navadmin extends Component{
 				 admin=<div class="collapse navbar-collapse main-menus" id="navbarSupportedContent">
 			            <ul class="navbar-nav ml-auto">
 			              <li class="nav-item">
-			                <NavLink to="/eachpayment"  onClick={()=>this.handleclick("payment")} class={this.state.payment}>Your Payments</NavLink>
+			                <NavLink to="/eachpayment"  onClick={()=>this.handleclick("eachpayment")} class={this.state.payment}>Your Payments</NavLink>
 			              </li>
 			              <li class="nav-item">
-			                <NavLink to="/posts"  onClick={()=>this.handleclick("post")} class={this.state.post}>See Posts</NavLink>
+			                <NavLink to="/posts"  onClick={()=>this.handleclick("posts")} class={this.state.post}>See Posts</NavLink>
 			              </li>
 			           
 			                  </ul>

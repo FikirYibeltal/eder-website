@@ -224,7 +224,7 @@ var products = this.props.products.payment.slice();
     
       return (
       <div>
-        <Navadmin />
+        <Navadmin authenticateduser={this.state.authenticateduser}/>
         <div class="belownav"></div>
         <h2 class="title-style-1">Payment List <span class="title-under"></span></h2>
         <ProductTable description={this.props.description.description} usernames={this.props.usernames.username} onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)}  onProductTableUpdates={this.handleProductTables.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.props.products.payment} filterText={this.state.filterText}/>

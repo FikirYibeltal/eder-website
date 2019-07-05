@@ -20,22 +20,32 @@ class Navs extends Component{
 				contact:"nav-item"
 		}
 		componentWillMount=(e)=>{
-		//console.log(UserProfile.getNav());
-      	if(UserProfile.getNav()==""){
-      		this.setState({
+		if(localStorage.getItem('path')){
+			this.setState({
+      			[localStorage.getItem('path')]:"nav-item active"
+      		});
+
+		}else{
+			this.setState({
       			home:"nav-item active"
-      		})
-      	}else{
-      		this.setState({
-      			[UserProfile.getNav()]:"nav-item active"
-      		})
-      	}
+      		});
+		}
+		//console.log(UserProfile.getNav());
+      	// if(UserProfile.getNav()==""){
+      	// 	this.setState({
+      	// 		home:"nav-item active"
+      	// 	})
+      	// }else{
+      	// 	this.setState({
+      	// 		[UserProfile.getNav()]:"nav-item active"
+      	// 	})
+      	// }
 	 }
 
 		handleclick=(e)=>{
 			
-			UserProfile.setNav(e);
-
+			//UserProfile.setNav(e);
+			localStorage.setItem('path',e);
 			//console.log(UserProfile.getNav());
 			for (var item in this.state){
 
@@ -47,9 +57,13 @@ class Navs extends Component{
 				         return returnObj;
 				    }.bind(e)();
 				    this.setState( stateObject ); 	
-				} 
+				}else{
+					this.setState({
+      					[item]:"nav-item"
+      				});
+				}
 			}
-			console.log(this.state);
+			//console.log(this.state);
 		}
 
 	render(){

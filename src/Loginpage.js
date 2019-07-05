@@ -16,39 +16,22 @@ class Loginpage extends Component{
 			email:"",
 			password:""
 		};
-	
-	handleClick=(e)=>{
-		e.preventDefault();
-		// console.log(e);
-		var token=localStorage.getItem('token');
-		console.log(token);
-		if(token){
+		componentWillMount=(e)=>{
+			var token=localStorage.getItem('token');
+			if(token){
 				var decoded=verifytoken(token);
-				// console.log(decoded);
 				if(decoded){
 					console.log(decoded);
 					let path = `posts`;
     			 	this.props.history.push(path);
     			 	localStorage.setItem('path',path);
-    			 }else{
-    			 	let path = `login`;
-    			 	this.props.history.push(path);
-    			 	localStorage.setItem('path',path);
     			 }
-				// var current_time = new Date().getTime() / 1000;
-				
-				// var decoded = decode(token);
-				// if(current_time<decoded.exp){
-				// 	console.log(decoded);
-				// 	UserProfile.setName(decoded.user.Name);
-	   //     			UserProfile.setId(decoded.user.User_id);
-	   //      		let path = `posts`;
-    // 			 	this.props.history.push(path);
-				// }else{
-
-				// }
-				
-		}else{
+			}
+		}
+	
+	handleClick=(e)=>{
+		e.preventDefault();
+		
 			axios.post('/login',{
 				Email:this.state.email,
 				Password:this.state.password})
@@ -58,19 +41,24 @@ class Loginpage extends Component{
 						token=`${res.data.token}`;
 						localStorage.setItem('token',`${res.data.token}`);
 					}else{
+						
 						console.log('it doesnot exist');
+						alert('Email or Passord is incorrect');
 					}
 					if (token){
 							var decoded=verifytoken(token);
 							if(decoded){
-							console.log(decoded);
+							//console.log(decoded);
 							let path = `posts`;
 		    			 	this.props.history.push(path);
 		    			 	localStorage.setItem('path',path)
 		    			 }else{
 		    			 	let path = `login`;
+		    			 	console.log('invalid login');
+		    			 	alert('Email or Passord is incorrect');
 		    			 	this.props.history.push(path);
 		    			 	localStorage.setItem('path',path);
+
 		    			 }
 						
 							
@@ -80,7 +68,6 @@ class Loginpage extends Component{
 					.catch((err)=>{
 						console.log(err);
 					})
-		}
 		 
 	// 	axios.get(`/getalluser`)
 	// 	.then(res=>{

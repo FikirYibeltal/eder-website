@@ -26,11 +26,25 @@ class App extends Component {
 
     componentWillMount=(e)=>{
     // console.log(UserProfile.getNav());
-   
-    if((!UserProfile.getName() || UserProfile.getNav()=="") && UserProfile.getNav()!='home'){
-        let path = UserProfile.getNav();
-      this.props.history.push(path);
+    let publicpath=['home','about','photogallery','event','contact'];
+    if(localStorage.getItem('path')){
+        if(publicpath.includes(localStorage.getItem('path'))){
+            if(localStorage.getItem('path')=='home'){
+                  this.props.history.push('');
+               }else{
+                  this.props.history.push(localStorage.getItem('path'));
+               }
+          }
     }
+    
+    
+    // console.log('app e');
+    // console.log(e);
+     
+    // if((!UserProfile.getName() || UserProfile.getNav()=="") && UserProfile.getNav()!='home'){
+    //     let path = UserProfile.getNav();
+    //   this.props.history.push(path);
+    // }
       
   }
   render() {

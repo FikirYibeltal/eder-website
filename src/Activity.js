@@ -160,7 +160,7 @@ var products = this.props.products.activity.slice();
 
     return (
       <div>
-        <Navadmin />
+        <Navadmin authenticateduser={this.state.authenticateduser}/>
         <div class="belownav"></div>
         <h2 class="title-style-1">Activity List <span class="title-under"></span></h2>
         <ProductTable  onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.props.products.activity} filterText={this.state.filterText}/>

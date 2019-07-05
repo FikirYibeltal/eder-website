@@ -87,7 +87,7 @@ import verifytoken from './extra/Verifytoken';
           render(){
             return(
               <div>
-                  <Navadmin />
+                  <Navadmin authenticateduser={this.state.authenticateduser}/>
                   <div class="belownav"></div>
                    <h2 class="title-style-1">Upload Image <span class="title-under"></span></h2>
                   <div class="container imagetogallery">

@@ -41,9 +41,9 @@ class Activity extends Component {
         this.props.history.push(path);
 
       }
-    
+    let config={headers:{Authorization:`Bearer ${token}`}};
     //this.props.onfetchPaymentApi();
-     axios.get("/getactivity")
+     axios.get("/api/getactivity",config)
       .then((res)=>{
         console.log(res);
 
@@ -53,7 +53,7 @@ class Activity extends Component {
         
       });
 
-      axios.get("/getpayment")
+      axios.get("/api/getpayment",config)
       .then((res)=>{
         var payment=this.state.payments;
         var id=UserProfile.getId();
@@ -124,7 +124,7 @@ class Activity extends Component {
 
     return (
       <div>
-        <Navadmin />
+        <Navadmin authenticateduser={this.state.authenticateduser}/>
         <div class="belownav"></div>
         <h2 class="title-style-1"> Your Payment <span class="title-under"></span></h2>
         <ProductTable  onUpdateDatabase={this.updatedatabase.bind(this)} onUserInput={this.handleUserInput.bind(this)} onProductTableUpdate={this.handleProductTable.bind(this)} onRowAdd={this.handleAddEvent.bind(this)} onRowDel={this.handleRowDel.bind(this)} products={this.state.products} filterText={this.state.filterText}/>

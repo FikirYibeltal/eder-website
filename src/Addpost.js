@@ -243,7 +243,7 @@ import './Addpost.css';
 
           return (
             <div>
-            <Navadmin />
+            <Navadmin authenticateduser={this.state.authenticateduser} />
             <div class="belownav"></div>
             <h2 class="title-style-1">Add Post ... <span class="title-under"></span></h2>
             <div class="container">
